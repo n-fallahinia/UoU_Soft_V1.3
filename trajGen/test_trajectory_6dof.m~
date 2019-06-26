@@ -1,0 +1,71 @@
+clear;
+clc;
+close all;
+
+num_data_points = 60;
+hold_length = 4;
+dp = 1;
+dr = 1;
+pos_range = 2;
+rot_range = 2;
+p_range = (-pos_range:dp:pos_range)/1000.0;
+r_range = (-rot_range:dr:rot_range)*pi/180;
+
+nx = length(p_range);
+ny = length(p_range);
+nz = length(p_range);
+nrx = length(r_range);
+nry = length(r_range);
+nrz = length(r_range);
+traj = zeros(nx*ny*nz*nrx*nry*nrz,6);
+currentIdx = 0;
+for xIdx = 1:nx
+    x_cur = p_range(xIdx);
+    for yIdx = 1:ny
+        y_cur = p_range(yIdx);
+        for zIdx = 1:nz
+            z_cur = p_range(zIdx);
+
+            % Don't go beyond the edges of the circle
+            radius = sqrt(x_cur^2 + y_cur^2 + z_cur^2);
+            if (radius > 0.012)
+                continue;
+            end
+            
+            % Continue in the radial directions
+            for rxIdx = 1:nrx
+                rx_cur = r_range(rxIdx);
+                for ryIdx = 1:nry
+                    ry_cur = r_range(ryIdx);
+                    for rzIdx = 1:nrz
+                        rz_cur = r_range(rzIdx);
+                        currentIdx = currentIdx + 1;
+                        traj(currentIdx,:) = [x_cur y_cur z_cur rx_cur ry_cur rz_cur];
+                    end
+                end
+            end
+        end
+    end
+end
+
+traj(currentIdx+1:end,:) = [];
+
+figure(1);
+plot3(traj(:,1),traj(:,2),traj(:,3),'k.');
+title(sprintf('%d points', currentIdx));
+
+% Generate a random order in which to visit the trajectory points
+[sorted, order] = sort(rand(currentIdx,1));
+num_traj_points = 150;
+
+% Print the trajectory in a file in the random order
+num_traj = 5;
+for trajIdx = 1:num_traj
+    filename = 'pos_all_01.txt';
+    fileID = fopen(filename,'w');
+    fprintf(fileID, '%d\n', currentIdx);
+    for pointIdx = 1:num_traj_points
+        fprintf(fileID, '%6.3f %6.3f  %6.3f %6.3f %6.3f %6.3f\n', traj(order(pointIdx),1), traj(order(pointIdx),2), traj(order(pointIdx),3), traj(order(pointIdx),4), traj(order(pointIdx),5), traj(order(pointIdx),6));
+    end
+    fclose(fileID);
+end

@@ -1,0 +1,78 @@
+clear
+clc
+close all
+
+mu = 0.5;
+df = 0.25;
+fsmin = -5;
+fsmax = 5;
+fnmin = -3.5;
+fnmax = 0;
+
+fs = fsmin:df:fsmax;
+fn = fnmin:df:fnmax;
+m = length(fs);
+n = length(fn);
+count = 0;
+
+for i=1:n,
+    fz = fn(i);
+    for j=1:m,
+        fy = fs(j);
+        for k=1:m,
+            fx = fs(k);
+            FS = sqrt(fx^2+fy^2);
+            if FS < mu*abs(fz),
+                count = count + 1;
+                f(count,1:3) = [fx fy fz];
+            end
+        end
+    end
+end
+
+figure(1)
+plot3(f(:,1),f(:,2),f(:,3),'k.')
+axis equal
+
+for i=1:count,
+    for j=i:count,
+        d = sqrt((f(i,1)-f(j,1))^2+(f(i,2)-f(j,2))^2+(f(i,3)-f(j,3))^2);
+        dist(i,j) = d;
+        dist(j,i) = d;
+    end
+end
+
+order = 1:count;
+for j = 1:(count-1),
+    idx = j+1;
+    dold = dist(order(j),order(idx));
+    for i=idx:count,
+        d = dist(order(j),order(i));
+        if d < dold,
+            dold = d;
+            idx = i;
+        end
+    end
+    if idx ~= j+1,
+        temp = order(j+1);
+        order(j+1) = order(idx);
+        order(idx) = temp;
+    end
+    distance(j) = sqrt(
+%     disp(order)
+end
+
+hold on
+plot3(f(order,1),f(order,2),f(order,3),'ro-')
+
+ind = 1:count;
+figure(2)
+plot(ind,f(order,1),'k.',ind,f(order,2),'ro',ind,f(order,3),'bx')
+
+filename = sprintf('traj%03d_%03d.txt',round(mu*100),round(df*100));
+output = fopen(filename,'w');
+fprintf(output,'%d',count);
+for i=1:count,
+    fprintf(output,'\n%5.3f\t%5.3f\t%5.3f\t0.0\t0.0\t0.0',f(order(i),1),f(order(i),2),f(order(i),3));
+end
+fclose(output);

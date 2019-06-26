@@ -1,0 +1,38 @@
+% Read a force trajectory file
+
+clear;
+clc;
+close all;
+
+% Define options
+options = set_default_options();
+
+% Load the list of trajectory files
+files = dir('finger_*.txt');
+num_files = length(files);
+fig_rows =
+
+% Display all trajectory files
+figure(1);
+set(1,'Position',options.default_position);
+figure(2);
+set(2,'Position',options.default_position);
+for fileIdx = 1:num_files
+    forces = textread(files(fileIdx).name);
+    num_forces = forces(1,1);
+    forces(1,:) = [];
+    if (size(forces,1) ~= num_forces)
+        error('Data size is inconsistent!');
+    end
+    
+    % Plot the forces
+    figure(1);
+    plot3(forces(:,1),forces(:,2),forces(:,3),'.','MarkerSize',options.marker_size,'Color',options.marker_colors(fileIdx,:));
+    hold on;
+end % fileIdx
+hold off;
+axis equal;
+xlabel('F_x','FontSize',options.font_size);
+ylabel('F_y','FontSize',options.font_size);
+zlabel('F_z','FontSize',options.font_size);
+set(gca,'FontSize',options.font_size);

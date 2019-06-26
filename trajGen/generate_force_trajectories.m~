@@ -1,0 +1,158 @@
+clear
+clc
+close all
+
+mu = 2/3;
+simple = false;
+writeFile = true;
+
+% Shear Setup
+sMin = -5;
+sMax = 5;
+
+% Normal Range, Part 1
+nMax = 0;
+nMin = -2.5;
+df = 0.25;
+nRange1 = nMax:-df:nMin;
+sRange1 = sMin:df:sMax;
+
+[Fx1,Fy1,Fz1] = make_forces(sRange1,nRange1,mu,simple,false,true);
+Fx1(1) = [];
+Fy1(1) = [];
+Fz1(1) = [];
+
+% Normal Range, Part 2
+df = df*4;
+nMax = -3;
+nMin = -7;
+nRange2 = nMax:-df:nMin;
+sRange2 = sMin:df:sMax;
+
+[Fx2,Fy2,Fz2] = make_forces(sRange2,nRange2,mu,simple,true,true);
+
+% Normal Range, Part 3
+df = df*1;
+nMax = nMin-df;
+nMin = -10;
+nRange3 = nMax:-df:nMin;
+sRange3 = sMin:df:sMax;
+
+[Fx3,Fy3,Fz3] = make_forces(sRange3,nRange3,mu,simple,false,false);
+
+Fx = [Fx1 Fx2 Fx3];
+Fy = [Fy1 Fy2 Fy3];
+Fz = [Fz1 Fz2 Fz3];
+% Fx = Fx3;
+% Fy = Fy3;
+% Fz = Fz3;
+
+figure(1)
+plot3(Fx,Fy,Fz,'k.-')
+axis equal
+view(-77,3);
+xlabel('F_x')
+ylabel('F_y')
+zlabel('F_z')
+
+n = length(Fx);
+figure(2)
+subplot(3,1,1)
+plot(1:n,Fx,'k.')
+subplot(3,1,2)
+plot(1:n,Fy,'k.')
+subplot(3,1,3)
+plot(1:n,Fz,'k.')
+
+fprintf('There are %d trajectory points.\n', n);
+minute = floor(0.5*n/60);
+sec = 0.5*n - 60*minute;
+fprintf('This should take about %d:%06.3f minutes per finger.\n', minute,sec);
+
+% Write full trajectory to one file
+if writeFile,
+    % Write finger file
+    filename = 'finger_0a.txt';
+    fid = fopen(filename,'w');
+    fprintf(fid,'%d\n',n);
+    for fIdx = 1:n,
+        fprintf(fid, '%6.2f\t%6.2f\t%6.2f\t0.0\t0.0\t0.0\n', Fx(fIdx), Fy(fIdx), Fz(fIdx));
+    end
+    fclose(fid);
+    
+    % Write thumb file
+    filename = 'thumb_0a.txt';
+    fid = fopen(filename,'w');
+    fprintf(fid,'%d\n',n);
+    for fIdx = 1:n,
+        % Use -Fz for x-dir and +Fx for z-dir for thumb calibration
+        fprintf(fid, '%6.2f\t%6.2f\t%6.2f\t0.0\t0.0\t0.0\n', -Fz(fIdx), Fy(fIdx), Fx(fIdx));
+    end
+    fclose(fid);
+end
+
+max_pts = 200;
+max = ceil(n/max_pts);
+figure(3)
+for i = 1:nSegs,
+    range_start = 1+max_pts*(i-1);
+    range_end = min([max_pts+max_pts*(i-1) n]);
+    range = range_start:range_end;
+    trajX = Fx(range);
+    trajY = Fy(range);
+    trajZ = Fz(range);
+    num_pts = length(range);
+    
+    subplot(3,nSegs,i)
+    plot(range,trajX,'k.')
+    axis([min(range) max(range) min(Fx) max(Fx)])
+    
+    subplot(3,nSegs,nSegs+i)
+    plot(range,trajY,'k.')
+    axis([min(range) max(range) min(Fy) max(Fy)])
+    
+    subplot(3,nSegs,2*nSegs+i)
+    plot(range,trajZ,'k.')
+    axis([min(range) max(range) min(Fz) max(Fz)])
+    
+    dx = diff(trajX);
+    dy = diff(trajY);
+    dz = diff(trajZ);
+    distance = sqrt(dx.^2+dy.^2+dz.^2);
+    fprintf('The maximum distance between points in Trajectory %d is %5.2f N.\n', i, max(distance));
+    
+    if writeFile,
+        % Write finger files
+        filename = sprintf('finger_%da.txt',i);
+        fid = fopen(filename,'w');
+        fprintf(fid,'%d\n',num_pts);
+        for fIdx = 1:num_pts,
+            fprintf(fid, '%6.2f\t%6.2f\t%6.2f\t0.0\t0.0\t0.0\n', trajX(fIdx), trajY(fIdx), trajZ(fIdx));
+        end
+        fclose(fid);
+        
+        % Write thumb files
+        filename = sprintf('thumb_%da.txt',i);
+        fid = fopen(filename,'w');
+        fprintf(fid,'%d\n',num_pts);
+        for fIdx = 1:num_pts,
+            % Use -Fz for x-dir and +Fx for z-dir for thumb calibration
+            fprintf(fid, '%6.2f\t%6.2f\t%6.2f\t0.0\t0.0\t0.0\n', -trajZ(fIdx), trajY(fIdx), trajX(fIdx));
+        end
+        fclose(fid);
+    end
+end
+
+dx = diff(Fx);
+dy = diff(Fy);
+dz = diff(Fz);
+distance = sqrt(dx.^2+dy.^2+dz.^2);
+fprintf('The maximum distance between points is %5.2f N.\n', max(distance));
+
+figure(4)
+plot(1:(n-1),distance,'k.')
+
+r = find(distance == max(distance));
+for i=1:length(r),
+    fprintf('Between forces %d and %d: [%5.2f %5.2f %5.2f]-[%5.2f %5.2f %5.2f]\n',r(i),r(i)+1,Fx(r(i)),Fy(r(i)),Fz(r(i)),Fx(r(i)+1),Fy(r(i)+1),Fz(r(i)+1));
+end

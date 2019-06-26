@@ -1,0 +1,259 @@
+% MAKE_FORCES_CYLINDRICAL Generates the XYZ Cartesian forces corresponding
+% to the cylindrical grid forces that will properly traverse the force cone
+% for use in Fingernail Imaging calibration.
+%
+% sRange is the shear range
+% nRange is the normal force range
+% mu is the coefficient of static friction
+% simple is a Boolean.  If true, the function does not reorder the points,
+%   it only generates them according to meshgrid().  Otherwise, the
+%   function uses an algorithm to 'zig-zag' around the grid.
+% flipZ is a Boolean.  It is used to reverse the zig-zag patterns on each
+%   level of normal force.
+% altY is a Boolean.  It is used to reverse the zig-zag patterns on each
+%   level of of y-direction force.
+% 
+% Because the grid changes size at different levels, these last two Boolean
+%   values have been set by trial and error in the past.  There may be a
+%   more methodical way to do this.
+% 
+
+function [Fx,Fy,Fz] = make_forces_cylindrical(sRange,tRange,nRange,mu)
+
+
+
+if simple,
+    [Fx,Fy,Fz] = meshgrid(sRange,sRange,nRange);
+    Fs = sqrt(Fx.^2+Fy.^2);
+    leave_out = find(Fs > mu*abs(Fz));
+    Fx(leave_out) = [];
+    Fy(leave_out) = [];
+    Fz(leave_out) = [];
+else
+    nZ = length(nRange);
+    nX = length(sRange);
+    count = 0;
+    for zIdx = 1:nZ,
+        fz = nRange(zIdx);
+%         if fz == -8
+%             keyboard;
+%         end
+        if flipZ,
+            if mod(zIdx,2) == 0,
+                for yIdx = nX:-1:1,
+                    fy = sRange(yIdx);
+                    if altY,
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    else
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    end
+                end
+            else
+                for yIdx = 1:nX,
+                    fy = sRange(yIdx);
+                    if altY,% || zIdx == 1,
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    else
+                        if mod(yIdx,2) == 0,
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            if mod(zIdx,2) == 0,
+                for yIdx = 1:nX,
+                    fy = sRange(yIdx);
+                    if altY,
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    else
+                        if mod(yIdx,2) == 0,
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    end
+                end
+            else
+                for yIdx = nX:-1:1,
+                    fy = sRange(yIdx);
+                    if altY,
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    else
+                        if mod(yIdx,2) == 0,
+                            for xIdx = 1:nX,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        else
+                            for xIdx = nX:-1:1,
+                                fx = sRange(xIdx);
+                                fs = sqrt(fx^2+fy^2);
+                                if fs <= mu*abs(fz),
+                                    count = count + 1;
+                                    Fx(count) = fx;
+                                    Fy(count) = fy;
+                                    Fz(count) = fz;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end

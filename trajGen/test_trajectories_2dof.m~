@@ -1,0 +1,55 @@
+clear;
+clc;
+close all;
+
+num_data_points = 60;
+hold_length = 4;
+dx = 3;
+dz = 3;
+x_min = -5;
+x_max = 5;
+z_min = -10;
+z_max = 0;
+x_range = (x_min:dx:x_max);
+z_range = (z_min:dz:z_max);
+
+nx = length(x_range);
+nz = length(z_range);
+traj = zeros(nx*nz*nry,3);
+currentIdx = 0;
+for xIdx = 1:nx
+    x_cur = x_range(xIdx);
+    for zIdx = 1:nz
+        z_cur = z_range(zIdx);
+        
+        % Don't go beyond the edges of the circle
+        radius = sqrt(x_cur^2 + z_cur^2);
+        if (radius > 0.012)
+            continue;
+        end
+        
+        for ryIdx = 1:nry
+            ry_cur = ry_range(ryIdx);
+            currentIdx = currentIdx + 1;
+            traj(currentIdx,:) = [x_cur z_cur ry_cur];
+        end
+    end
+end
+
+traj(currentIdx+1:end,:) = [];
+
+figure(1);
+plot3(traj(:,1),traj(:,2),traj(:,3),'k.');
+title(sprintf('%d points', currentIdx));
+
+% Generate a random order in which to visit the trajectory points
+[sorted, order] = sort(rand(currentIdx,1));
+
+% Print the trajectory in a file in the random order
+filename = 'pos_yz_05.txt';
+fileID = fopen(filename,'w');
+fprintf(fileID, '%d\n', currentIdx);
+for pointIdx = 1:currentIdx
+    fprintf(fileID, ' 0.000 %6.3f  %6.3f %6.3f 0.000  0.000\n', traj(order(pointIdx),1), traj(order(pointIdx),2), traj(order(pointIdx),3));
+end
+fclose(fileID);

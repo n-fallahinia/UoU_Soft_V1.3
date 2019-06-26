@@ -1,0 +1,76 @@
+% MAKE_FORCES_SPIRAL Generates the XYZ Cartesian forces corresponding
+% to the spiral grid forces that will properly traverse the force cone
+% for use in Fingernail Imaging calibration.
+%
+% sRange is the shear range
+% tRange is the angle range
+% nRange is the normal force range
+% mu is the coefficient of static friction
+% 
+
+function [Fx,Fy,Fz] = make_forces_spiral(sRange,tRange,nRange,mu)
+
+nZ = length(nRange);
+nT = length(tRange);
+nS = length(sRange);
+count = 0;
+for zIdx = 1:nZ,
+    fz = nRange(zIdx);
+    if mod(zIdx,2) == 0,
+        for sIdx = 1:nS,
+            fs = sRange(sIdx);
+            if fs <= mu*abs(fz),
+                if fs == 0,
+                    count = count + 1;
+                    Fx(count) = 0;
+                    Fy(count) = 0;
+                    Fz(count) = fz;
+                elseif mod(sIdx,2) == 0,
+                    for tIdx = 1:nT,
+                        theta = tRange(tIdx);
+                        count = count + 1;
+                        Fx(count) = fs*cos(theta);
+                        Fy(count) = fs*sin(theta);
+                        Fz(count) = fz;
+                    end
+                else
+                    for tIdx = nT:-1:1,
+                        theta = tRange(tIdx);
+                        count = count + 1;
+                        Fx(count) = fs*cos(theta);
+                        Fy(count) = fs*sin(theta);
+                        Fz(count) = fz;
+                    end
+                end
+            end
+        end
+    else
+        for sIdx = nS:-1:1,
+            fs = sRange(sIdx);
+            if fs <= mu*abs(fz),
+                if fs == 0,
+                    count = count + 1;
+                    Fx(count) = 0;
+                    Fy(count) = 0;
+                    Fz(count) = fz;
+                elseif mod(sIdx,2) == 0,
+                    for tIdx = nT:-1:1,
+                        theta = tRange(tIdx);
+                        count = count + 1;
+                        Fx(count) = fs*cos(theta);
+                        Fy(count) = fs*sin(theta);
+                        Fz(count) = fz;
+                    end
+                else
+                    for tIdx = 1:nT,
+                        theta = tRange(tIdx);
+                        count = count + 1;
+                        Fx(count) = fs*cos(theta);
+                        Fy(count) = fs*sin(theta);
+                        Fz(count) = fz;
+                    end
+                end
+            end
+        end
+    end
+end
