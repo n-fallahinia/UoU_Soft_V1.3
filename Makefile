@@ -40,7 +40,7 @@ all: $(TARGET)
 
 $(info ==================== University of Utah ====================)
 $(info ===================== Bio-Robotics Lab =====================)
-$(info ============== Calibration Software GUI_ctc V1.2 ===========)
+$(info ============== Calibration Software GUI_ctc V1.3 ===========)
 $(info )
 
 # Rule to build regular .o files
