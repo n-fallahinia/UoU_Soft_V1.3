@@ -1,0 +1,2038 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0304
+header_name {.h}
+code_name {.cxx}
+decl {\#include "CameraControl.h"} {private local
+}
+
+decl {\#include "Images.h"} {private local
+}
+
+decl {\#include <stdio.h>} {private local
+}
+
+decl {\#include "ImageDisplay.h"} {private local
+}
+
+decl {char demo_dir[] = "~/haptics/bin/";} {private local
+}
+
+decl {CameraControl camera_m;} {private local
+}
+
+decl {Images image_buff;} {private local
+}
+
+decl {Training current_training;} {private local
+}
+
+decl {bool flag_camera_on = false;} {private local
+}
+
+decl {bool flag_force_ready = false;} {private local
+}
+
+decl {bool flag_start_training = false;} {private local
+}
+
+decl {bool flag_thumb = false;} {private local
+}
+
+decl {\#define GAIN_TEXT 10} {private local
+}
+
+decl {int image_counter = 0;} {private local
+}
+
+decl {char data_dir[] = "../data_00_0_00x/";} {private local
+}
+
+decl {int order[18];} {private local
+}
+
+Function {main()} {open return_type int
+} {
+  Fl_Window control_window {
+    label {Fingernail Imaging Calibration Software} open
+    xywh {2091 233 945 745} type Double
+    code0 {\#include <stdio.h>} visible
+  } {
+    Fl_Box box_maglev_rotation {
+      label {Maglev Position}
+      xywh {10 21 260 189} box ENGRAVED_BOX align 1
+      code0 {\#include <FL/glut.H>}
+      code1 {\#include <FL/gl.h>}
+      code2 {\#include "Plot2DView.h"}
+      class Plot2DView
+    }
+    Fl_Box box_maglev_position {
+      label {Maglev Position}
+      xywh {10 225 260 240} box ENGRAVED_BOX align 1
+      code0 {\#include <FL/glut.H>}
+      code1 {\#include <FL/gl.h>}
+      code2 {\#include "Graph3DAxis.h"}
+      class Graph3DAxis
+    }
+    Fl_Box display_force {
+      label {Display Force}
+      xywh {10 469 260 257} box ENGRAVED_BOX align 2
+      code0 {\#include <FL/glut.H>}
+      code1 {\#include <FL/gl.h>}
+      code2 {\#include "CubeView.h"}
+      class CubeView
+    }
+    Fl_Tabs {} {open
+      xywh {275 20 635 705}
+    } {
+      Fl_Group maglev_position {
+        label Maglev open selected
+        xywh {280 55 625 620}
+      } {
+        Fl_Group position_gain_sliders {
+          label {Position Control PID Gains}
+          xywh {295 78 595 478} box BORDER_FRAME color 34
+        } {
+          Fl_Group position_gain_sliders_x {
+            label {x-direction}
+            xywh {337 95 130 200}
+          } {
+            Fl_Value_Slider position_gain_x_P {
+              label Kp
+              callback update_controller_gains
+              xywh {337 95 30 200} minimum 3000 maximum 0 step 100
+            }
+            Fl_Value_Slider position_gain_x_I {
+              label Ki
+              callback update_controller_gains
+              xywh {382 95 30 200} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider position_gain_x_D {
+              label Kd
+              callback update_controller_gains
+              xywh {427 95 30 200} minimum 20 maximum 0 step 1
+            }
+          }
+          Fl_Group position_gain_sliders_y {
+            label {y-direction}
+            xywh {528 95 130 200}
+          } {
+            Fl_Value_Slider position_gain_y_P {
+              label Kp
+              callback update_controller_gains
+              xywh {528 95 30 200} minimum 3000 maximum 0 step 100
+            }
+            Fl_Value_Slider position_gain_y_I {
+              label Ki
+              callback update_controller_gains
+              xywh {573 95 30 200} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider position_gain_y_D {
+              label Kd
+              callback update_controller_gains
+              xywh {623 95 30 200} minimum 20 maximum 0 step 1
+            }
+          }
+          Fl_Group position_gain_sliders_z {
+            label {z-direction}
+            xywh {705 95 152 200}
+          } {
+            Fl_Value_Slider position_gain_z_P {
+              label Kp
+              callback update_controller_gains
+              xywh {718 95 30 200} minimum 10000 maximum 0 step 500
+            }
+            Fl_Value_Slider position_gain_z_I {
+              label Ki
+              callback update_controller_gains
+              xywh {763 95 30 200} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider position_gain_z_D {
+              label Kd
+              callback update_controller_gains
+              xywh {808 95 30 200} minimum 20 maximum 0 step 1
+            }
+          }
+          Fl_Group rotation_gain_sliders_x {
+            label {x-rotation}
+            xywh {334 331 130 205}
+          } {
+            Fl_Value_Slider rotation_gain_x_P {
+              label Kp
+              callback update_controller_gains
+              xywh {334 331 30 205} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider rotation_gain_x_I {
+              label Ki
+              callback update_controller_gains
+              xywh {379 331 30 205} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider rotation_gain_x_D {
+              label Kd
+              callback update_controller_gains
+              xywh {424 331 30 205} minimum 0.2 maximum 0
+            }
+          }
+          Fl_Group rotation_gain_sliders_y {
+            label {y-rotation}
+            xywh {530 331 130 205}
+          } {
+            Fl_Value_Slider rotation_gain_y_P {
+              label Kp
+              callback update_controller_gains
+              xywh {530 331 30 205} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider rotation_gain_y_I {
+              label Ki
+              callback update_controller_gains
+              xywh {575 331 30 205} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider rotation_gain_y_D {
+              label Kd
+              callback update_controller_gains
+              xywh {620 331 30 205} minimum 0.2 maximum 0
+            }
+          }
+          Fl_Group rotation_gain_sliders_z {
+            label {z-rotation}
+            xywh {715 331 130 205}
+          } {
+            Fl_Value_Slider rotation_gain_z_P {
+              label Kp
+              callback update_controller_gains
+              xywh {715 331 30 205} minimum 20 maximum 0 step 1
+            }
+            Fl_Value_Slider rotation_gain_z_I {
+              label Ki
+              callback update_controller_gains
+              xywh {760 331 30 205} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider rotation_gain_z_D {
+              label Kd
+              callback update_controller_gains
+              xywh {805 331 30 205} minimum 0.2 maximum 0
+            }
+          }
+        }
+        Fl_Button button_maglev_connect_separate {
+          label Connect
+          callback {// Check the current state of the Maglev
+if (maglev_m.flag_maglev_start)
+{
+        // Synchronize the buttons
+        button_maglev_connect_separate->clear();
+        button_maglev_connect->clear();
+        
+        // Land the Maglev, if needed
+        if ( button_maglev_lift_land -> value() )
+        {
+                button_maglev_lift_land_separate->clear();
+                button_maglev_lift_land->clear();
+        }
+        
+        // Turn off the Maglev
+        maglev_m.maglevTurnOff ( );
+        
+        // Activate the thumb checkboxes
+        finger_index->activate();
+        check_calibrate_thumb->activate();
+}
+else
+{
+        // Synchronize the buttons
+        button_maglev_connect_separate->set();
+        button_maglev_connect->set();
+        
+        // Start the force sensor
+        force_sensor_m.startForceSensor();
+        
+        // Turn on the "draw force reading" callback
+        printf("Turning on a callback to draw the force sensor readings (%5.3f)\\n", 1.0/FORCE_FREQUENCY);
+        Fl::add_timeout(1.0/FORCE_FREQUENCY, forceSensorReading);
+        display_force->flag_force_display = true;
+        
+        // Connect to the Maglev
+        maglev_m.maglevConnect (  );
+        
+        // Deactivate the Thumb Calibration checkbox
+        finger_index->deactivate();
+        check_calibrate_thumb->deactivate();
+        
+        // Turn on the "draw maglev position" callback
+        printf("Turning on a callback to draw the Maglev position readings (%5.3f)\\n", 1.0/MAGLEV_FREQUENCY);
+        Fl::add_timeout(1.0/MAGLEV_FREQUENCY, draw_maglev_position);
+}}
+          xywh {360 585 110 35} type Toggle
+          code0 {\#include "MaglevControl.h"}
+        }
+        Fl_Button button_maglev_lift_land_separate {
+          label {Lift/Land}
+          callback {// Make sure the maglev has been started
+if (maglev_m.flag_maglev_start)
+{
+        if (button_maglev_lift_land_separate->value())
+        {
+                // Make sure the "real" button matches this one
+                button_maglev_lift_land->set();
+                
+                // Have the Maglev take off
+                maglev_m.maglevTakeOff ( flag_thumb );
+                
+                // Load the Maglev internal gains into the slider bars
+                update_gain_sliders();
+                
+                // Load the Maglev operating frequency into the slider bar
+                slider_maglev_frequency->value(maglev_m.maglevGetFrequency( ));
+        }
+        else
+        {
+                // Make sure the "real" button matches this one
+                button_maglev_lift_land->clear();
+                
+                // Land the Maglev
+                maglev_m.maglevLand (  );
+        }
+}
+else
+{
+        // Turn off this button and the one on the "real" tab
+        button_maglev_lift_land_separate->clear();
+        button_maglev_lift_land->clear();
+}}
+          xywh {530 585 105 35} type Toggle
+        }
+        Fl_Value_Slider slider_maglev_frequency {
+          label Frequency
+          callback {maglev_m.maglevSetFrequency( slider_maglev_frequency->value() );}
+          xywh {365 646 250 29} type Horizontal box BORDER_BOX color 42 selection_color 88 minimum 100 maximum 1500 step 10 value 1000 textsize 14
+        }
+        Fl_Check_Button check_calibrate_thumb {
+          label {Check This Box for Thumb}
+          callback {// Make sure the drop-down box matches this one
+if (check_calibrate_thumb->value())
+{
+        finger_index->value(1);
+        flag_thumb = true;
+        desired_force_x->value(1.0);
+        desired_force_x->maximum(0.5);
+        desired_force_x->minimum(10.0);
+        desired_force_x->step(0.5);
+        desired_force_z->value(0.0);
+        desired_force_z->maximum(-5.0);
+        desired_force_z->minimum(5.0);
+        desired_force_z->step(0.25);
+        maglev_m.desired_force[0] = 1.5;
+        maglev_m.desired_force[2] = 0.0;
+}
+else
+{
+        finger_index->value(2);
+        flag_thumb = false;
+        desired_force_x->value(0.0);
+        desired_force_x->maximum(-5.0);
+        desired_force_x->minimum(5.0);
+        desired_force_x->step(0.25);
+        desired_force_z->value(-1.0);
+        desired_force_z->maximum(-10.0);
+        desired_force_z->minimum(-0.5);
+        desired_force_z->step(0.5);
+        maglev_m.desired_force[0] = 0.0;
+        maglev_m.desired_force[2] = -1.5;
+}
+generate_trajectory_file();}
+          xywh {675 585 210 45} down_box DOWN_BOX align 16
+        }
+      }
+      Fl_Group force_controller {
+        label {Force Controller} open
+        xywh {280 74 614 647} box FLAT_BOX hide
+      } {
+        Fl_Group force_gain_sliders {
+          label {Force Control PID Gains}
+          xywh {285 89 460 385} box ENGRAVED_FRAME
+        } {
+          Fl_Group force_gain_sliders_x {
+            label {x Force}
+            xywh {290 106 120 350}
+          } {
+            Fl_Value_Slider force_gain_x_P {
+              label Kp
+              callback update_controller_gains
+              xywh {290 106 30 350} minimum 5 maximum 0 step 0.1
+            }
+            Fl_Value_Slider force_gain_x_I {
+              label Ki
+              callback update_controller_gains
+              xywh {335 106 30 350} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider force_gain_x_D {
+              label Kd
+              callback update_controller_gains
+              xywh {380 106 30 350} minimum 50 maximum 0 step 1
+            }
+          }
+          Fl_Group force_gain_sliders_y {
+            label {y Force}
+            xywh {455 106 120 350}
+          } {
+            Fl_Value_Slider force_gain_y_P {
+              label Kp
+              callback update_controller_gains
+              xywh {455 106 30 350} minimum 5 maximum 0 step 0.1
+            }
+            Fl_Value_Slider force_gain_y_I {
+              label Ki
+              callback update_controller_gains
+              xywh {500 106 30 350} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider force_gain_y_D {
+              label Kd
+              callback update_controller_gains
+              xywh {545 106 30 350} minimum 50 maximum 0 step 1
+            }
+          }
+          Fl_Group force_gain_sliders_z {
+            label {z Force}
+            xywh {620 106 120 350}
+          } {
+            Fl_Value_Slider force_gain_z_P {
+              label Kp
+              callback update_controller_gains
+              xywh {620 106 30 350} minimum 5 maximum 0 step 0.1
+            }
+            Fl_Value_Slider force_gain_z_I {
+              label Ki
+              callback update_controller_gains
+              xywh {665 106 30 350} minimum 100 maximum 0 step 5
+            }
+            Fl_Value_Slider force_gain_z_D {
+              label Kd
+              callback update_controller_gains
+              xywh {710 106 30 350} minimum 50 maximum 0 step 1
+            }
+          }
+        }
+        Fl_Group target_forces {
+          label {Desired Forces} open
+          xywh {759 89 135 320} box ENGRAVED_FRAME
+        } {
+          Fl_Value_Slider desired_force_x {
+            label Fx
+            callback update_desired_force
+            xywh {764 94 30 295} minimum 6 maximum -6 step 0.25
+          }
+          Fl_Value_Slider desired_force_y {
+            label Fy
+            callback update_desired_force
+            xywh {809 94 32 295} minimum 6 maximum -6 step 0.25
+          }
+          Fl_Value_Slider desired_force_z {
+            label Fz
+            callback update_desired_force
+            xywh {854 94 30 295} minimum -0.5 maximum -15 step 0.25 value -1
+          }
+        }
+        Fl_Group target_positions {
+          label {Desired Positions}
+          xywh {758 428 135 290} box ENGRAVED_FRAME
+        } {
+          Fl_Value_Slider desired_position_x {
+            label x_p
+            callback update_desired_position
+            xywh {763 438 30 125} minimum 12 maximum -12 step 1
+          }
+          Fl_Value_Slider desired_position_y {
+            label y_p
+            callback update_desired_position
+            xywh {808 438 30 125} minimum 12 maximum -12 step 1
+          }
+          Fl_Value_Slider desired_position_z {
+            label z_p
+            callback update_desired_position
+            xywh {853 438 30 125} minimum 12 maximum -12 step 1
+          }
+          Fl_Value_Slider desired_rotation_x {
+            label x_r
+            callback update_desired_position
+            xywh {763 583 30 115} minimum 8 maximum -8 step 1
+          }
+          Fl_Value_Slider desired_rotation_y {
+            label y_r
+            callback update_desired_position
+            xywh {808 583 30 115} minimum 8 maximum -8 step 1
+          }
+          Fl_Value_Slider desired_rotation_z {
+            label z_r
+            callback update_desired_position
+            xywh {853 583 30 115} minimum 8 maximum -8 step 1
+          }
+        }
+        Fl_Button start_force_controller_separate {
+          label {Start Force Controller}
+          callback {// Determine whether the external controller is running
+if (maglev_m.flag_force_control_start)
+{
+        // Synchronize both buttons -- Shutting off the external controller
+        start_force_controller->clear();
+        start_force_controller_separate->clear();
+        
+        // Stop the force controller
+        maglev_m.maglevStopForceController();
+        update_gain_sliders();
+}
+else if(maglev_m.flag_maglev_start && force_sensor_m.flag_force_sensor)
+{
+        // Synchronize both buttons -- Turning on the external controller
+        start_force_controller->set();
+        start_force_controller_separate->set();
+        
+        // Set the desired forces to the values shown on the sliders
+        maglev_m.desired_force[0] = desired_force_x->value();
+        maglev_m.desired_force[1] = desired_force_y->value();
+        maglev_m.desired_force[2] = desired_force_z->value();
+        
+        // Start the force controller
+	maglev_m.maglevStartForceController();
+}
+else
+{
+        // Synchronize both buttons -- The external controller will not be running
+        start_force_controller->clear();
+        start_force_controller_separate->clear();
+        
+        // Explain to the user why the external force controller is not going to start
+        printf("Cannot start the external controller:\\n");
+        if (!maglev_m.flag_maglev_start)
+        {
+                printf("\\tThe Maglev is not on!\\n");
+        }
+        if (!force_sensor_m.flag_force_sensor)
+        {
+                printf("\\tThe force sensor is not on!\\n");
+        }
+}}
+          xywh {290 491 180 39} type Toggle color 88 selection_color 2
+          code0 {\#include <iostream>}
+        }
+        Fl_Button {} {
+          label {Save new gains}
+          callback {maglev_m.maglevSaveGains();}
+          xywh {295 555 170 25}
+        }
+        Fl_Button {} {
+          label {Save Force}
+          callback {// Code to start saving the force data
+// Verify that the data directory exists
+update_data_dir();
+if(access(data_dir,F_OK))
+{
+	printf("===========================\\nThe data directory does not exist...creating it!\\n===========================\\n");
+	int error = mkdir(data_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if(error > 0)
+	{
+		printf("Could not create data directory!!\\n");
+		return;
+	}
+}
+
+// Tell the Maglev to start saving the force
+maglev_m.maglevSaveForce();}
+          xywh {295 580 170 25}
+        }
+        Fl_Button {} {
+          label {Stop Save}
+          callback {// Code to stop saving the force data
+// Tell the Maglev to stop saving the force data
+maglev_m.maglevStopSaveForce();}
+          xywh {295 605 170 25}
+        }
+        Fl_Group system_id {
+          label {System Identification Parameters}
+          xywh {479 505 250 178} box ENGRAVED_BOX
+        } {
+          Fl_Value_Slider slide_force_magnitude {
+            label {Force Frequency Mantissa (a)}
+            xywh {497 528 200 20} type Horizontal box BORDER_BOX color 42 selection_color 88 minimum 0.1 maximum 0.9 step 0.1 value 0.1 textsize 14
+          }
+          Fl_Value_Slider slide_force_power {
+            label {Force Frequency Power (b)}
+            xywh {494 588 200 20} type Horizontal box BORDER_BOX color 42 selection_color 88 minimum -3 maximum 3 step 1 textsize 14
+          }
+          Fl_Text_Display force_frequency {
+            label Frequency
+            xywh {499 648 195 20}
+          }
+        }
+      }
+      Fl_Group camera_control {
+        label {Camera Control} open
+        xywh {275 55 635 670} box ENGRAVED_FRAME hide
+      } {
+        Fl_Group camera_settings {
+          label {Camera Settings}
+          xywh {285 519 625 197} box ENGRAVED_FRAME
+        } {
+          Fl_Value_Slider camera_brightness {
+            label Brightness
+            xywh {293 543 231 21} type Horizontal align 8 textsize 14
+          }
+          Fl_Value_Slider camera_exposure {
+            label Exposure
+            xywh {293 580 230 20} type Horizontal align 8 textsize 14
+          }
+          Fl_Value_Slider camera_gamma {
+            label Gamma
+            xywh {294 616 230 20} type Horizontal align 8 textsize 14
+          }
+          Fl_Value_Slider camera_shutter {
+            label Shutter
+            xywh {295 650 230 20} type Horizontal align 8 textsize 14
+          }
+          Fl_Value_Slider camera_framerate {
+            label {Frame rate}
+            xywh {295 685 230 20} type Horizontal align 8 textsize 14
+          }
+          Fl_Value_Slider camera_gain {
+            label Gain
+            xywh {620 682 230 20} type Horizontal align 8 textsize 14
+          }
+          Fl_Button camera_load_settings {
+            label {Load Settings}
+            xywh {675 595 140 35}
+          }
+          Fl_Button camera_save_settings {
+            label {Save Settings}
+            xywh {675 535 140 35}
+          }
+        }
+        Fl_Button button_start_camera_separate {
+          label {Start Camera}
+          callback {if (button_start_camera_separate->value())
+{
+        // Make sure the "real" button on the all_together tab is synchronized
+        button_start_camera->set();
+        
+        // Start the camera
+        if (!camera_m.startCamera())
+        {
+                button_start_camera_separate->clear();
+                button_start_camera->clear();
+                return;
+        }
+        
+        // Determine the size of the camera images and allocate memory for an image
+        int cols = camera_m.num_cols;
+        int rows = camera_m.num_rows;
+        int inc = camera_m.num_colors;
+        unsigned char temp_image[cols*rows*inc];
+        
+        // Get a new image from the camera
+        camera_m.grabImage();
+        camera_m.getImage( temp_image );
+        
+        // Write the image to the image buffer
+        image_buff.writeImage( rows, cols, inc, temp_image );
+        
+        //Set the timers for taking new images and displaying them
+        Fl::add_timeout(1.0/CAMERA_FREQUENCY, takeImage, NULL);
+        Fl::add_timeout(1.0/CAMERA_FREQUENCY, displayImage, NULL);
+        
+        // Set the "camera on" flag
+        flag_camera_on = true;
+}
+else
+{
+        // Make sure the "real" button on the all_together tab is synchronized
+        button_start_camera->clear();
+        
+        // Turn the camera off
+        Fl::remove_timeout(takeImage, NULL);
+        Fl::remove_timeout(displayImage, NULL);
+        flag_camera_on = false;
+        
+        // Wait for the last callback to run
+        Fl::wait(3);
+        
+        // Remove the camera handles
+        camera_m.turnOffCamera();
+}}
+          xywh {340 393 150 45} type Toggle
+          code0 {\#include "CameraControl.h"}
+        }
+        Fl_Button {} {
+          label {@>}
+          callback {//if ( flag_camera_start )
+//	fl_draw_image ( current_image, display_x, display_y, display_w, display_h, 3, 0);}
+          xywh {595 401 40 30} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX
+        }
+        Fl_Button {} {
+          label {@square}
+          xywh {645 401 40 30} box PLASTIC_UP_BOX
+        }
+        Fl_Button {} {
+          label {@|>}
+          xywh {695 401 40 30} box PLASTIC_UP_BOX
+        }
+        Fl_Button {} {
+          label {@<|}
+          xywh {745 401 40 30} box PLASTIC_UP_BOX
+        }
+        Fl_Button button_record {
+          label {@circle}
+          callback {// CAMERA_TEST_CODE}
+          xywh {795 401 40 30} type Toggle box PLASTIC_UP_BOX labelcolor 88
+        }
+        Fl_Value_Slider {} {
+          label Frame
+          xywh {324 454 515 30} type Horizontal box PLASTIC_UP_BOX align 6 maximum 200 step 1 textsize 14
+        }
+        Fl_Box image_display_b {
+          label {Display Image}
+          xywh {340 75 495 305} box ENGRAVED_FRAME
+          code0 {\#include "ImageDisplay.h"}
+          class ImageDisplay
+        }
+      }
+      Fl_Group training_trajectories {
+        label Training
+        xywh {280 55 615 185} hide
+      } {
+        Fl_Button {} {
+          label {Select file}
+          callback {/*training_browser->load(".", 1);
+
+
+training_file_name->value( training_browser->text(training_browser->value()) );
+*/
+Fl_File_Chooser* fc = new Fl_File_Chooser("./trajGen/large_trajectory","Text Files (*.{txt,dat,tex})",Fl_File_Chooser::SINGLE,"Text File");
+fc->callback(fileChooserCallback);
+fc->show();}
+          xywh {280 80 160 25}
+          code0 {\#include <FL/Fl_File_Browser.H>}
+          code1 {\#include <FL/Fl_File_Chooser.H>}
+        }
+        Fl_Input training_file_name_separate {
+          label {Trajectory File:}
+          xywh {460 100 320 27} align 5
+        }
+        Fl_Button read_trajectory_file_separate {
+          label {Read in Trajectory}
+          callback {//Load the training trajectory from the file
+// Read the trajectory file
+current_training.ReadTrajectoryFile(training_file_name->value());
+
+if (!current_training.flag_trajectory_ready)
+{
+        printf("The trajectory file did not read correctly!\\n");
+        return;
+}}
+          xywh {280 105 160 25}
+          code0 {\#include "Training.h"}
+        }
+        Fl_Button {} {
+          label {Start Training}
+          callback {//Check other things are ready
+// Verify that the data directory exists
+update_data_dir();
+if(access(data_dir,F_OK))
+{
+	printf("===========================\\nThe data directory does not exist...creating it!\\n===========================\\n");
+	int error = mkdir(data_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if(error > 0)
+	{
+		printf("Could not create data directory!!\\n");
+		return;
+	}
+}
+
+// Load the training trajectory from the file
+if (!current_training.flag_trajectory_ready)
+{
+        // Try to read the trajectory file
+        current_training.ReadTrajectoryFile(training_file_name->value());
+        if (!current_training.flag_trajectory_ready)
+        {
+                printf("The trajectory file did not read correctly!\\n");
+                return;
+        }
+}
+
+if ((!flag_camera_on) || (!maglev_m.flag_force_control_start))
+{
+        if (!flag_camera_on)
+                printf("The camera is off!\\n");
+        if (!maglev_m.flag_force_control_start)
+                printf("The force controller is off!\\n");
+        printf("Please correct these problems and try again!\\n");
+        return;
+}
+
+// Set flags
+flag_force_ready = false; // Marks when the Sensor is measuring the desired force
+flag_start_training = true; // True until the trajectory has finished
+
+// Set the progress bar to 0%
+training_progress->value(0.0);
+training_percent->value("0.0");
+
+printf("It will take %5.2f minutes.\\n", current_training.max_count * (((double)(current_training.ramp_max + current_training.hold_min))/TRAINING_FREQUENCY)/60.0);
+
+//Set a timer for training recording
+Fl::add_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);}
+          xywh {280 130 160 25}
+        }
+        Fl_Input {} {
+          label {Training Record:}
+          xywh {460 160 320 28} align 5
+        }
+        Fl_Button {} {
+          label Pause
+          xywh {280 155 160 25}
+        }
+        Fl_Button {} {
+          label {Stop Training}
+          xywh {280 180 160 25}
+        }
+      }
+      Fl_Group all_together {
+        label {All Together} open
+        xywh {275 55 635 670} align 17 hide
+      } {
+        Fl_Box image_display_m {
+          label {Display Image}
+          xywh {330 70 530 400} box ENGRAVED_FRAME
+          code0 {\#include "ImageDisplay.h"}
+          class ImageDisplay
+        }
+        Fl_Choice trajectory_index {
+          label TrajID
+          callback generate_trajectory_file
+          xywh {470 490 60 30} down_box BORDER_BOX
+          code0 {// Put initialization code here
+// Add an invisible, blank item to the list
+trajectory_index->add("<nothing>",0,0,0,FL_MENU_INVISIBLE);
+
+// Read the trajectory order from a file
+Fl_File_Chooser* fc = new Fl_File_Chooser("./trajGen/large_trajectory","Text Files (*.{txt,dat,tex})",Fl_File_Chooser::SINGLE,"Text File");
+fc->callback(traj_file_chooser);
+fc->show();
+
+// Add each trajectory to the list
+char temp[2];
+for (int i=1; i<=18; i++)
+{
+        sprintf(temp, "%02d", order[i-1]);
+        trajectory_index->add(temp);
+}
+
+// Set the default trajectory
+trajectory_index->value(1);}
+        } {}
+        Fl_Output training_percent {
+          xywh {560 490 170 30}
+          code0 {// Initialization code here
+// Change the text color
+training_percent->textcolor(FL_DARK_RED);}
+        }
+        Fl_Output training_file_name {
+          label {Trajectory File:}
+          xywh {385 541 515 34} align 5
+        }
+        Fl_Progress training_progress {
+          label {Training Progress}
+          xywh {385 585 515 35} align 2
+          code0 {// Initialization code here
+// Change the bar color
+//training_progress->color(FL_DARK_GREEN);
+training_progress->color2(FL_DARK_RED);}
+        }
+        Fl_Button save_data {
+          label {Save Data}
+          callback {// Start/Stop saving force controller data
+// Disable the button until the Saving/Resetting is finished
+save_data->deactivate();
+
+// Change behavior based on toggle value of the button
+if (!save_data->value())
+{
+        // If the button is pressed, stop saving data
+        maglev_m.maglevStopSaveForce();
+        
+        // Change the label on the button
+        save_data->label("Save Data");
+}
+else
+{
+        // If the button is not pressed, start saving data
+        
+        // Verify that the data directory exists
+        update_data_dir();
+        if(access(data_dir,F_OK))
+        {
+	        printf("===========================\\nThe data directory does not exist...creating it!\\n===========================\\n");
+	        int error = mkdir(data_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	        if(error > 0)
+	        {
+		        printf("Could not create data directory!!\\n");
+		        return;
+	        }
+        }
+        
+        // Tell the Maglev to start saving the force
+        maglev_m.maglevSaveForce();
+        
+        // Change the label on the button
+        save_data->label("Stop Save");
+}
+
+// Re-enable the button
+save_data->activate();}
+          xywh {780 485 80 40} type Toggle
+        }
+        Fl_Choice subject_index {
+          label Subj
+          xywh {314 548 60 30} down_box BORDER_BOX
+          code0 {// Put initialization code here
+// Add an invisible, blank item to the list
+subject_index->add("<nothing>",0,0,0,FL_MENU_INVISIBLE);
+
+// Add each finger to the list
+char temp[2];
+for (int i=1; i<=32; i++)
+{
+        sprintf(temp, "%02d", i);
+        subject_index->add(temp);
+}
+
+// Set the default subject
+subject_index->value(1);}
+        } {}
+        Fl_Choice trajectory_type {
+          callback generate_trajectory_file
+          xywh {288 488 85 25} down_box BORDER_BOX
+          code0 {// Put initialization code here
+// Add each trajectory to the list
+trajectory_type->add("Cart.");
+trajectory_type->add("Cyl.");
+
+// Set the default trajectory type
+trajectory_type->value(0);}
+        } {}
+        Fl_Choice finger_index {
+          callback change_finger
+          xywh {289 518 85 25} down_box BORDER_BOX
+          code0 {// Put initialization code here
+// Add an invisible, blank item to the list
+finger_index->add("<nothing>",0,0,0,FL_MENU_INVISIBLE);
+
+// Add each finger to the list
+finger_index->add("thumb");
+finger_index->add("index");
+finger_index->add("middle");
+finger_index->add("ring");
+finger_index->add("little");
+
+// Set the default finger
+finger_index->value(2);
+generate_trajectory_file();}
+        } {}
+        Fl_Button button_maglev_connect {
+          label Connect
+          callback {// Check the current state of the Maglev
+if (maglev_m.flag_maglev_start)
+{
+        // Synchronize the buttons
+        button_maglev_connect_separate->clear();
+        button_maglev_connect->clear();
+        
+        
+        // Reactivate the Lift/Land button
+        if ( button_maglev_lift_land -> value() )
+        {
+                button_maglev_lift_land_separate->clear();
+                button_maglev_lift_land->clear();
+        }
+        maglev_m.maglevTurnOff ( );
+        
+        // Reactivate the finger selection box
+        finger_index->activate();
+        check_calibrate_thumb->activate();
+        
+        // Reset the "Save Data" button
+        save_data->activate();
+        save_data->clear();
+        save_data->label("Save Data");
+}
+else
+{
+        // Synchronize the buttons
+        button_maglev_connect_separate->set();
+        button_maglev_connect->set();
+        
+        // Start the force sensor
+        force_sensor_m.startForceSensor();
+        
+        // Turn on the "draw force reading" callback
+        printf("Turning on a callback to draw the force sensor readings (%5.3f)\\n", 1.0/FORCE_FREQUENCY);
+        Fl::add_timeout(1.0/FORCE_FREQUENCY, forceSensorReading);
+        display_force->flag_force_display = true;
+        
+        // Connect to the Maglev
+        maglev_m.maglevConnect (  );
+        
+        // Deactivate the Thumb Calibration checkbox
+        finger_index->deactivate();
+        check_calibrate_thumb->deactivate();
+        
+        // Turn on the "draw maglev position" callback
+        printf("Turning on a callback to draw the Maglev position/rotation readings.\\n");
+        Fl::add_timeout(1.0/MAGLEV_FREQUENCY, draw_maglev_position);
+}}
+          xywh {284 583 90 35} type Toggle
+          code0 {\#include "MaglevControl.h"}
+        }
+        Fl_Button button_maglev_lift_land {
+          label {Lift Off}
+          callback {// Make sure the maglev has been started
+if (maglev_m.flag_maglev_start)
+{
+        // Make sure the "separate" button is synchronized this one
+        if (button_maglev_lift_land->value())
+        {
+                // Synchronize the "separate" button on the maglev_control tab
+                button_maglev_lift_land_separate->set();
+                
+                // Have the Maglev take off
+                maglev_m.maglevTakeOff ( flag_thumb );
+                
+                // Set the values of the gain sliders
+                update_gain_sliders();
+                
+                // Set the Frequency slider
+                slider_maglev_frequency->value(maglev_m.maglevGetFrequency( ));
+        }
+        else
+        {
+                // Synchronize the "separate" button on the maglev_control tab
+                button_maglev_lift_land_separate->clear();
+                
+                // Land the Maglev
+                maglev_m.maglevLand (  );
+        }
+}
+else
+{
+        // Clear this button and the "separate" button on the maglev_control tab
+        button_maglev_lift_land->clear();
+        button_maglev_lift_land_separate->clear();
+}}
+          xywh {284 618 90 33} type Toggle
+        }
+        Fl_Button button_start_camera {
+          label Camera
+          callback {// Start the camera
+if (button_start_camera->value())
+{
+        // Make sure the "separate" button on the camera_control tab is synchronized
+        button_start_camera_separate->set();
+        
+        // Start the camera
+        if (!camera_m.startCamera())
+        {
+                button_start_camera_separate->clear();
+                button_start_camera->clear();
+                return;
+        }
+        
+        // Determine the size of the camera images and allocate memory for an image
+        int cols = camera_m.num_cols;
+        int rows = camera_m.num_rows;
+        int inc = camera_m.num_colors;
+        unsigned char temp_image[cols*rows*inc];
+        
+        // Get a new image from the camera
+        camera_m.grabImage();
+        camera_m.getImage( temp_image );
+        
+        // Write the image to the image buffer
+        image_buff.writeImage( rows, cols, inc, temp_image );
+        
+        //Set the timers for taking new images and displaying them
+        Fl::add_timeout(1.0/CAMERA_FREQUENCY, takeImage, NULL);
+        Fl::add_timeout(1.0/CAMERA_FREQUENCY, displayImage, NULL);
+        
+        // Set the "camera on" flag
+        flag_camera_on = true;
+}
+else
+{
+        // Make sure the "separate" button on the camera_control tab is synchronized
+        button_start_camera_separate->clear();
+        
+        // Turn the camera off
+        Fl::remove_timeout(takeImage, NULL);
+        Fl::remove_timeout(displayImage, NULL);
+        flag_camera_on = false;
+        
+        // Wait for the last callback to run
+        Fl::wait(3);
+        
+        // Remove the camera handles
+        camera_m.turnOffCamera();
+}}
+          xywh {284 652 90 34} type Toggle
+          code0 {\#include "CameraControl.h"}
+        }
+        Fl_Button start_force_controller {
+          label Controller
+          callback {// Determine whether the external controller is running
+if (maglev_m.flag_force_control_start)
+{
+        // Synchronize both buttons -- Shutting off the external controller
+        start_force_controller->clear();
+        start_force_controller_separate->clear();
+        
+        // Stop the force controller
+        maglev_m.maglevStopForceController();
+        update_gain_sliders();
+}
+else if(maglev_m.flag_maglev_start && force_sensor_m.flag_force_sensor)
+{
+        // Synchronize both buttons -- Turning on the external controller
+        start_force_controller->set();
+        start_force_controller_separate->set();
+        
+        // Set the desired forces to the values shown on the sliders
+        maglev_m.desired_force[0] = desired_force_x->value();
+        maglev_m.desired_force[1] = desired_force_y->value();
+        maglev_m.desired_force[2] = desired_force_z->value();
+        
+        // Start the force controller
+	maglev_m.maglevStartForceController();
+}
+else
+{
+        // Synchronize both buttons -- The external controller will not be running
+        start_force_controller->clear();
+        start_force_controller_separate->clear();
+        
+        // Explain to the user why the external force controller is not going to start
+        printf("Cannot start the external controller:\\n");
+        if (!maglev_m.flag_maglev_start)
+        {
+                printf("\\tThe Maglev is not on!\\n");
+        }
+        if (!force_sensor_m.flag_force_sensor)
+        {
+                printf("\\tThe force sensor is not on!\\n");
+        }
+}}
+          xywh {284 686 90 34} type Toggle
+          code0 {\#include <iostream>}
+        }
+        Fl_Button start_training {
+          label Start
+          callback {// Start/Stop the training trajectory
+// Check whether the training trajectory is already running
+if (flag_start_training)
+{
+        // If it is running, then stop it
+        flag_start_training = false;
+        start_training->label("Start");
+}
+else
+{
+        // Re-generate trajectory file
+        generate_trajectory_file();
+        update_data_dir();
+        
+        // Verify that the data directory exists
+        if(access(data_dir,F_OK))
+        {
+	        printf("===========================\\nThe data directory does not exist...creating it!\\n===========================\\n");
+	        int error = mkdir(data_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	        if(error > 0)
+	        {
+		        printf("Got an error!\\n");
+	        }
+        }
+        
+        // Load the training trajectory from the file
+        current_training.ReadTrajectoryFile(training_file_name->value());
+        
+        // Verify that the following conditions have been met:
+        //      (1) Camera is on
+        //      (2) Maglev force controller is on
+        //      (3) Trajectory file was successfully read
+        if ( (!flag_camera_on) || (!maglev_m.flag_force_control_start) || (!current_training.flag_trajectory_ready))
+        {
+                if (!flag_camera_on)
+                        printf("The camera is off!\\n");
+                if (!maglev_m.flag_force_control_start)
+                        printf("The force controller is off!\\n");
+                if (!current_training.flag_trajectory_ready)
+                        printf("The trajectory file did not read correctly!\\n");
+                printf("Please correct these problems and try again!\\n");
+                start_training->clear();
+                return;
+        }
+        
+        // Set flags
+        flag_force_ready = false; // Marks when the Sensor is measuring the desired force
+        flag_start_training = true; // True until the trajectory has finished
+        start_training->label("Stop");
+        
+        // Set the progress bar to 0%
+        training_progress->value(0.0);
+        training_percent->value("0.0");
+        
+        printf("It will take %5.2f minutes.\\n", current_training.max_count * (((double)(current_training.ramp_max + current_training.hold_min))/TRAINING_FREQUENCY)/60.0);
+        
+        //Set a timer for training recording
+        Fl::add_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);
+}}
+          xywh {585 640 110 40} type Toggle
+        }
+        Fl_Box {} {
+          label {watch out the Maglev position}
+          xywh {460 680 358 40} labelfont 14 labelsize 18
+        }
+      }
+    }
+  }
+  code {control_window->show();
+  return Fl::run();} {}
+  Fl_Window PopupCameraWindow {
+    label {Camera 1}
+    xywh {127 379 550 450} type Double hide
+  } {}
+}
+
+Function {update_desired_force()} {} {
+  code {// Code to update the desired Maglev force
+if ((maglev_m.flag_maglev_start) && (maglev_m.flag_force_control_start) && (!flag_start_training))
+{
+        // Set the desired force
+        maglev_m.desired_force[0] = desired_force_x->value();
+        maglev_m.desired_force[1] = desired_force_y->value();
+        maglev_m.desired_force[2] = desired_force_z->value();
+}} {}
+}
+
+Function {update_desired_position()} {} {
+  code {// Code to update the desired Maglev position
+if ((maglev_m.flag_maglev_start) && (!flag_start_training))
+{
+        // Set desired position, converting millimeters to meters
+        maglev_m.desired_position.values[0] = desired_position_x->value() / 1000.0;
+        maglev_m.desired_position.values[1] = desired_position_y->value() / 1000.0;
+        maglev_m.desired_position.values[2] = desired_position_z->value() / 1000.0;
+        
+        // Set desired rotation, converting degrees to radians
+        maglev_m.desired_position.values[3] = desired_rotation_x->value() * PI / 180.0;
+        maglev_m.desired_position.values[4] = desired_rotation_y->value() * PI / 180.0;
+        maglev_m.desired_position.values[5] = desired_rotation_z->value() * PI / 180.0;
+        
+        // Send the command to the Maglev
+        maglev_m.maglevSetDesiredPosition();
+}} {}
+}
+
+Function {update_controller_gains()} {} {
+  code {// Code to update the controller gains
+if ( maglev_m.flag_maglev_start )
+{
+        if (maglev_m.flag_force_control_start)
+        {
+                ////////////////////////////////////////////////////////////////
+                // Set the force gains to the values of the sliders
+                ////////////////////////////////////////////////////////////////
+                
+                // x-direction force gains
+                maglev_m.current_gains_force[0][0] = force_gain_x_P->value();
+                maglev_m.current_gains_force[0][1] = force_gain_x_I->value();
+                maglev_m.current_gains_force[0][2] = force_gain_x_D->value();
+                
+                // y-direction force gains
+                maglev_m.current_gains_force[1][0] = force_gain_y_P->value();
+                maglev_m.current_gains_force[1][1] = force_gain_y_I->value();
+                maglev_m.current_gains_force[1][2] = force_gain_y_D->value();
+                
+                // z-direction force gains
+                maglev_m.current_gains_force[2][0] = force_gain_z_P->value();
+                maglev_m.current_gains_force[2][1] = force_gain_z_I->value();
+                maglev_m.current_gains_force[2][2] = force_gain_z_D->value();
+                
+                ////////////////////////////////////////////////////////////////
+                // Set the position gains to the values of the sliders
+                ////////////////////////////////////////////////////////////////
+                
+                // Set the values for the x-position axis
+                maglev_m.current_gains_position[0][0] = position_gain_x_P->value();
+                maglev_m.current_gains_position[0][1] = position_gain_x_I->value();
+                maglev_m.current_gains_position[0][2] = position_gain_x_D->value();
+                
+                // Set the values for the y-position axis
+                maglev_m.current_gains_position[1][0] = position_gain_y_P->value();
+                maglev_m.current_gains_position[1][1] = position_gain_y_I->value();
+                maglev_m.current_gains_position[1][2] = position_gain_y_D->value();
+                
+                // Set the values for the z-position axis
+                maglev_m.current_gains_position[2][0] = position_gain_z_P->value();
+                maglev_m.current_gains_position[2][1] = position_gain_z_I->value();
+                maglev_m.current_gains_position[2][2] = position_gain_z_D->value();
+                
+                // Set the values for the x-rotation axis
+                maglev_m.current_gains_position[3][0] = rotation_gain_x_P->value();
+                maglev_m.current_gains_position[3][1] = rotation_gain_x_I->value();
+                maglev_m.current_gains_position[3][2] = rotation_gain_x_D->value();
+                
+                // Set the values for the y-rotation axis
+                maglev_m.current_gains_position[4][0] = rotation_gain_y_P->value();
+                maglev_m.current_gains_position[4][1] = rotation_gain_y_I->value();
+                maglev_m.current_gains_position[4][2] = rotation_gain_y_D->value();
+                
+                // Set the values for the z-rotation axis
+                maglev_m.current_gains_position[5][0] = rotation_gain_z_P->value();
+                maglev_m.current_gains_position[5][1] = rotation_gain_z_I->value();
+                maglev_m.current_gains_position[5][2] = rotation_gain_z_D->value();
+        }
+        else
+        {
+                ////////////////////////////////////////////////////////////////
+                // Set the internal position gains to the values of the sliders
+                ////////////////////////////////////////////////////////////////
+
+                // Set the values for the x-position axis
+                maglev_m.current_gains_internal[0][0] = position_gain_x_P->value();
+                maglev_m.current_gains_internal[0][1] = position_gain_x_I->value();
+                maglev_m.current_gains_internal[0][2] = position_gain_x_D->value();
+                
+                // Set the values for the y-position axis
+                maglev_m.current_gains_internal[1][0] = position_gain_y_P->value();
+                maglev_m.current_gains_internal[1][1] = position_gain_y_I->value();
+                maglev_m.current_gains_internal[1][2] = position_gain_y_D->value();
+                
+                // Set the values for the z-position axis
+                maglev_m.current_gains_internal[2][0] = position_gain_z_P->value();
+                maglev_m.current_gains_internal[2][1] = position_gain_z_I->value();
+                maglev_m.current_gains_internal[2][2] = position_gain_z_D->value();
+                
+                // Set the values for the x-rotation axis
+                maglev_m.current_gains_internal[3][0] = rotation_gain_x_P->value();
+                maglev_m.current_gains_internal[3][1] = rotation_gain_x_I->value();
+                maglev_m.current_gains_internal[3][2] = rotation_gain_x_D->value();
+                
+                // Set the values for the y-rotation axis
+                maglev_m.current_gains_internal[4][0] = rotation_gain_y_P->value();
+                maglev_m.current_gains_internal[4][1] = rotation_gain_y_I->value();
+                maglev_m.current_gains_internal[4][2] = rotation_gain_y_D->value();
+                
+                // Set the values for the z-rotation axis
+                maglev_m.current_gains_internal[5][0] = rotation_gain_z_P->value();
+                maglev_m.current_gains_internal[5][1] = rotation_gain_z_I->value();
+                maglev_m.current_gains_internal[5][2] = rotation_gain_z_D->value();
+                
+                // Set the Maglev's internal gains to the new values
+                maglev_m.maglevSetInternalGains();
+        }
+}} {}
+}
+
+Function {update_gain_sliders()} {return_type void
+} {
+  code {// Code to update the gain sliders goes here
+
+////////////////////////////////////////////////////////////////////////
+// Set the force control sliders to the values of the force gains
+////////////////////////////////////////////////////////////////////////
+
+// x-direction force gains
+force_gain_x_P->value(maglev_m.current_gains_force[0][0]);
+force_gain_x_I->value(maglev_m.current_gains_force[0][1]);
+force_gain_x_D->value(maglev_m.current_gains_force[0][2]);
+
+// y-direction force gains
+force_gain_y_P->value(maglev_m.current_gains_force[1][0]);
+force_gain_y_I->value(maglev_m.current_gains_force[1][1]);
+force_gain_y_D->value(maglev_m.current_gains_force[1][2]);
+
+// z-direction force gains
+force_gain_z_P->value(maglev_m.current_gains_force[2][0]);
+force_gain_z_I->value(maglev_m.current_gains_force[2][1]);
+force_gain_z_D->value(maglev_m.current_gains_force[2][2]);
+
+// Check whether the force controller is running
+if (maglev_m.flag_force_control_start)
+{
+        ////////////////////////////////////////////////////////////////////////
+        // Set the position control sliders to the values of the position gains
+        ////////////////////////////////////////////////////////////////////////
+        
+        // x-direction position gains
+        position_gain_x_P->value(maglev_m.current_gains_position[0][0]);
+        position_gain_x_I->value(maglev_m.current_gains_position[0][1]);
+        position_gain_x_D->value(maglev_m.current_gains_position[0][2]);
+        
+        // y-direction position gains
+        position_gain_y_P->value(maglev_m.current_gains_position[1][0]);
+        position_gain_y_I->value(maglev_m.current_gains_position[1][1]);
+        position_gain_y_D->value(maglev_m.current_gains_position[1][2]);
+        
+        // z-direction position gains
+        position_gain_z_P->value(maglev_m.current_gains_position[2][0]);
+        position_gain_z_I->value(maglev_m.current_gains_position[2][1]);
+        position_gain_z_D->value(maglev_m.current_gains_position[2][2]);
+        
+        // x-direction rotation gains
+        rotation_gain_x_P->value(maglev_m.current_gains_position[3][0]);
+        rotation_gain_x_I->value(maglev_m.current_gains_position[3][1]);
+        rotation_gain_x_D->value(maglev_m.current_gains_position[3][2]);
+        
+        // y-direction rotation gains
+        rotation_gain_y_P->value(maglev_m.current_gains_position[4][0]);
+        rotation_gain_y_I->value(maglev_m.current_gains_position[4][1]);
+        rotation_gain_y_D->value(maglev_m.current_gains_position[4][2]);
+        
+        // z-direction rotation gains
+        rotation_gain_z_P->value(maglev_m.current_gains_position[5][0]);
+        rotation_gain_z_I->value(maglev_m.current_gains_position[5][1]);
+        rotation_gain_z_D->value(maglev_m.current_gains_position[5][2]);
+}
+else
+{
+        ////////////////////////////////////////////////////////////////////////
+        // Set the position control sliders to the values of the position gains
+        ////////////////////////////////////////////////////////////////////////
+        
+        // x-direction position gains
+        position_gain_x_P->value(maglev_m.current_gains_internal[0][0]);
+        position_gain_x_I->value(maglev_m.current_gains_internal[0][1]);
+        position_gain_x_D->value(maglev_m.current_gains_internal[0][2]);
+        
+        // y-direction position gains
+        position_gain_y_P->value(maglev_m.current_gains_internal[1][0]);
+        position_gain_y_I->value(maglev_m.current_gains_internal[1][1]);
+        position_gain_y_D->value(maglev_m.current_gains_internal[1][2]);
+        
+        // z-direction position gains
+        position_gain_z_P->value(maglev_m.current_gains_internal[2][0]);
+        position_gain_z_I->value(maglev_m.current_gains_internal[2][1]);
+        position_gain_z_D->value(maglev_m.current_gains_internal[2][2]);
+        
+        // x-direction rotation gains
+        rotation_gain_x_P->value(maglev_m.current_gains_internal[3][0]);
+        rotation_gain_x_I->value(maglev_m.current_gains_internal[3][1]);
+        rotation_gain_x_D->value(maglev_m.current_gains_internal[3][2]);
+        
+        // y-direction rotation gains
+        rotation_gain_y_P->value(maglev_m.current_gains_internal[4][0]);
+        rotation_gain_y_I->value(maglev_m.current_gains_internal[4][1]);
+        rotation_gain_y_D->value(maglev_m.current_gains_internal[4][2]);
+        
+        // z-direction rotation gains
+        rotation_gain_z_P->value(maglev_m.current_gains_internal[5][0]);
+        rotation_gain_z_I->value(maglev_m.current_gains_internal[5][1]);
+        rotation_gain_z_D->value(maglev_m.current_gains_internal[5][2]);
+}} {}
+}
+
+decl {ForceSensor force_sensor_m} {public local
+}
+
+Function {forceSensorReading(void *)} {} {
+  code {if (display_force->flag_force_display)
+{
+        // Read a new set of data from the force sensor
+        if (!maglev_m.flag_force_control_start)
+        {
+                force_sensor_m.readNewData();
+        }
+        
+        // Set the height of the bars in the force display
+        display_force->height_x = force_sensor_m.curr_force.force[0];
+        display_force->height_y = force_sensor_m.curr_force.force[1];
+        display_force->height_z = force_sensor_m.curr_force.force[2];
+        display_force->height_rx = force_sensor_m.curr_force.force[3];
+        display_force->height_ry = force_sensor_m.curr_force.force[4];
+        display_force->height_rz = force_sensor_m.curr_force.force[5];
+        display_force->redraw();
+        //printf("%5.2f | %5.2f | %5.2f\\n", force_sensor_m.curr_force.time, force_sensor_m.curr_force.force[0], display_force->height_x);
+}
+//printf("Reading the force (%10.6f | %10.6f | %10.6f)\\n", force_sensor_m.curr_force.time, force_sensor_m.curr_force.force[2], display_force->height_z);
+
+// Set up the next iteration of this timer
+Fl::repeat_timeout(1.0/FORCE_FREQUENCY, forceSensorReading);} {}
+}
+
+decl {MaglevControl maglev_m} {public local
+}
+
+Function {tick_callback_handler( ml_device_handle_t maglev_handle,  ml_position_t *maglev_position )} {return_type int
+} {
+  code {// Code to execute on each "tick" goes here
+// Verify that the force sensor has been started
+if (display_force->flag_force_display)
+{
+        // Get a new force sensor reading
+        force_sensor_m.readNewData();
+}
+
+// Verify that the Maglev force controller is running
+if (maglev_m.flag_force_control_start)
+{
+        // Run the Maglev Controller
+        if (maglev_m.maglevController ( force_sensor_m.curr_force))
+        {
+                update_gain_sliders();
+        }
+}
+else
+{
+        for (int i=0; i<6; i++)
+        {
+                maglev_m.current_position.values[i] = (*maglev_position).values[i];
+        }
+}
+
+// Set the return value
+return 0;} {}
+}
+
+Function {fault_callback_handler( ml_device_handle_t maglev_handle,  ml_fault_t maglev_fault )} {return_type int
+} {
+  code {// Fault-handling code goes here
+// Detect all fault types currently registered
+if(maglev_fault.value != ML_FAULT_TYPE_CLEAR)
+{
+        printf("Faults currently registered: (");
+        // If a fault has occurred, determine whether one of the
+        //      components is an out-of-range fault
+        if (maglev_fault.value >= ML_FAULT_TYPE_FLOTOR_OVERSPEED)
+        {
+                // Flotor moving too fast
+                maglev_fault.value -= ML_FAULT_TYPE_FLOTOR_OVERSPEED;
+                printf("Flotor_Speed");
+        }
+        if (maglev_fault.value >= ML_FAULT_TYPE_COIL_OVERCURRENT)
+        {
+                // Coil current too high
+                maglev_fault.value -= ML_FAULT_TYPE_COIL_OVERCURRENT;
+                printf("Coil_Current ");
+        }
+        if (maglev_fault.value >= ML_FAULT_TYPE_COIL_OVERTEMP)
+        {
+                // Coil too hot
+                maglev_fault.value -= ML_FAULT_TYPE_COIL_OVERTEMP;
+                printf("Coil_Temp ");
+        }
+        if (maglev_fault.value >= ML_FAULT_TYPE_SENSOR_OUT_OF_RANGE)
+        {
+                // Sensor out of range
+                maglev_fault.value -= ML_FAULT_TYPE_SENSOR_OUT_OF_RANGE;
+                printf("Sensor_Range");
+        }
+        if (maglev_fault.value != ML_FAULT_TYPE_CLEAR)
+        {
+                printf(" ERROR - Unknown fault detected!");
+                return 1;
+        }
+        printf(")\\n");
+}
+return 0;} {}
+}
+
+Function {temp_callback_handler( ml_device_handle_t maglev_handle,  ml_temps_t *maglev_temps )} {return_type int
+} {
+  code {// Code to handle "overtemp" callback goes here
+printf("Overtemp violation! (");
+for (int i=0; i < 6; i++)
+{
+        printf("%9.4f ", (*maglev_temps).values[i]);
+}
+printf(")\\n");
+return 0;} {}
+}
+
+Function {boundary_callback_handler( ml_device_handle_t maglev_handle,  ml_boundary_violation_t *maglev_boundary )} {return_type int
+} {
+  code {// Code to handle "boundary violation" callback goes here
+printf("Boundary violation! (");
+for (int i=0; i < 6; i++)
+{
+        printf("%d ", (*maglev_boundary).values[i]);
+}
+printf(")\\n");
+return 0;} {}
+}
+
+Function {draw_maglev_position(void *)} {} {
+  code {// Continue running this timer as long as the Maglev is connected
+if (maglev_m.flag_maglev_start)
+{
+        // Update the Maglev's translational position reading in the display
+        // Set the height of the bars in the position display
+        box_maglev_position->set3DAxis( maglev_m.current_position.values );
+        box_maglev_position->redraw();
+	
+        // Update the Maglev's rotational position reading display
+        box_maglev_rotation->height_x = maglev_m.current_position.values[3];
+        box_maglev_rotation->height_y = maglev_m.current_position.values[4];
+        box_maglev_rotation->height_z = maglev_m.current_position.values[5];
+        box_maglev_rotation->redraw();
+        
+        // Update one of the Maglev's variables, based on the update_variable
+        //      (0) temperatures, (1) currents or (2) forces.
+	if (maglev_m.update_variable == 0)
+	{
+	        // Update the temperatures
+	        maglev_m.maglevGetTemperature();
+	        maglev_m.update_variable = 1;
+	}
+	else if (maglev_m.update_variable == 1)
+	{
+	        // Update the currents
+	        maglev_m.maglevGetCurrent();
+	        maglev_m.update_variable = 2;
+	        //maglev_m.update_variable = 0;
+	}
+	else if (maglev_m.update_variable == 2)
+	{
+	        // Update the internal forces
+	        maglev_m.maglevGetForce();
+	        maglev_m.update_variable = 0;
+	}
+	else
+	{
+	        // Since it has somehow been assigned an unapproved value, reset
+	        //      the update_variable so temperature will be processed
+	        //      next.
+	        maglev_m.update_variable = 0;
+	}
+        
+        // Set up the timer for the next update
+        Fl::repeat_timeout(1.0/MAGLEV_FREQUENCY, draw_maglev_position);
+}} {}
+}
+
+Function {displayImage(void *)} {open
+} {
+  code {// Code to display the current image buffer image
+// Determine whether the camera is on
+if (flag_camera_on)
+{
+        // Get the size of the image and allocate memory for it
+        int cols = image_buff.cols;
+        int rows = image_buff.rows;
+        int inc = image_buff.inc;
+        unsigned char temp_image[cols*rows*inc];
+        
+        // Read the image from the image buffer
+        image_buff.readImage( temp_image );
+        
+        // Send the image to the display box and draw it
+        image_display_m->readImage( temp_image, cols, rows, inc );
+        image_display_m->redraw();
+        
+        // Start the timer again
+        Fl::repeat_timeout(1.0/CAMERA_FREQUENCY, displayImage, NULL);
+}} {}
+}
+
+Function {takeImage(void *)} {} {
+  code {// Code to record a new image from the camera
+// Determine whether the camera is on
+if (flag_camera_on)
+{
+        // Get the size of the image and allocate memory for it
+        int cols = camera_m.num_cols;
+        int rows = camera_m.num_rows;
+        int inc = camera_m.num_colors;
+        unsigned char temp_image[cols*rows*inc];
+        
+        // Get a new image from the camera
+        if (!camera_m.grabImage())
+        {
+                flag_camera_on = false;
+        }
+        if (!camera_m.getImage( temp_image ))
+        {
+                flag_camera_on = false;
+        }
+        
+        // Send the image to the image buffer
+        image_buff.writeImage( temp_image );
+
+        // Start the timer again
+        Fl::repeat_timeout(1.0/CAMERA_FREQUENCY, takeImage, NULL);
+}} {}
+}
+
+Function {fileChooserCallback(Fl_File_Chooser* o, void* v)} {return_type void
+} {
+  code {//printf("Chose %s!\\n", o -> value());
+training_file_name->value(o -> value());
+training_file_name_separate->value(o -> value());} {}
+}
+
+Function {traj_file_chooser(Fl_File_Chooser* o, void* v)} {return_type void
+} {
+  code {// Select the trajectory order file
+char* traj_file_name = o->value();
+FILE *traj_file = fopen(traj_file_name, "r");
+
+// If the file did not open, use the defaults
+if (traj_file == NULL)
+{
+        printf("Cannot locate the selected trajectory order file. (%s)\\nUsing hard-coded defaults
+", traj_file_name);
+        fclose (traj_file);
+        for (int trajIdx = 0; trajIdx < num_traj; trajIdx++)
+        {
+                order[trajIdx] = trajIdx+1;
+        }
+}
+else
+{
+        // Read the data from the file
+        int a;
+        for (int trajIdx = 0; trajIdx < num_traj; trajIdx++)
+        {
+                fscanf(traj_file, "%d", &a);
+                order[trajIdx] = a;
+        }
+}} {}
+}
+
+Function {update_data_dir()} {return_type void
+} {
+  code {// Update the data directory name
+// Get the label of the current selection in trajectory_index
+const Fl_Menu_Item* miTraj = trajectory_index->mvalue();
+
+char* traj_type;
+if (trajectory_type->value() == 0)
+{
+        traj_type = "a";
+}
+else
+{
+        traj_type = "b";
+}
+
+// Generate the training file name
+sprintf(data_dir, "../data_%02d_%d_%s%s/", subject_index->value(), finger_index->value(), miTraj->label(), traj_type);
+maglev_m.maglevSetSaveFileName(data_dir);} {}
+}
+
+Function {generate_trajectory_file()} {return_type void
+} {
+  code {// Generate the trajectory file name
+// Get the label of the current selection in trajectory_index
+const Fl_Menu_Item* miTraj = trajectory_index->mvalue();
+
+char training_file[100];
+char* finger_name;
+char* traj_type;
+if (finger_index->value() == 1)
+{
+        finger_name = "thumb";
+}
+else
+{
+        finger_name = "finger";
+}
+if (trajectory_type->value() == 0)
+{
+        traj_type = "a";
+}
+else
+{
+        traj_type = "b";
+}
+
+// Generate the training file name
+sprintf(training_file, "./trajGen/large_trajectory/%s_%s%s.txt", finger_name, miTraj->label(), traj_type);
+training_file_name->value(training_file);} {}
+}
+
+Function {change_finger()} {return_type void
+} {
+  code {// Code for when the drop-down box is changed
+// Split based on whether the thumb or a finger is selected
+if (finger_index->value() == 1)
+{
+        // Synchronize the checkbox with the drop-down box
+        check_calibrate_thumb->set();
+        
+        // Set the flag that the thumb is being used
+        flag_thumb = true;
+        
+        // Reset the sliders for Desired Force in X and Z
+        desired_force_x->value(1.5);
+        desired_force_x->maximum(10.0);
+        desired_force_x->minimum(0.5);
+        desired_force_x->step(0.5);
+        desired_force_z->value(0.0);
+        desired_force_z->maximum(-5.0);
+        desired_force_z->minimum(5.0);
+        desired_force_z->step(0.25);
+        
+        // Set the desired force in x and z on the Maglev
+        maglev_m.desired_force[0] = 1.5;
+        maglev_m.desired_force[2] = 0.0;
+}
+else
+{
+        check_calibrate_thumb->clear();
+        flag_thumb = false;
+        desired_force_x->value(0.0);
+        desired_force_x->maximum(-5.0);
+        desired_force_x->minimum(5.0);
+        desired_force_x->step(0.25);
+        desired_force_z->value(-1.5);
+        desired_force_z->maximum(-10.0);
+        desired_force_z->minimum(-0.5);
+        desired_force_z->step(0.5);
+        maglev_m.desired_force[0] = 0.0;
+        maglev_m.desired_force[2] = -1.5;
+}
+
+// Change the trajectory file name, as needed
+generate_trajectory_file();} {}
+}
+
+Function {record_training_images(void *)} {return_type void
+} {
+  code {// Record training results
+// Set up the counter
+static int counter = 0;
+
+// If the force is ready, record an image
+if ((flag_force_ready) && (flag_start_training))
+//if (flag_force_ready)
+{
+	// Record the image
+	int cols = image_buff.cols;
+	int rows = image_buff.rows;
+  	int inc = image_buff.inc;
+	unsigned char temp_image[cols*rows*inc];
+	image_buff.readImage( temp_image );
+        
+	// Clear the flag so that the controller can go forward
+	current_training.current_count +=1;
+	
+	// Set the flag so that the force controller can go to next desired force
+	flag_force_ready = false;
+	
+	//Save the force into the image
+	// Fx, Fy are assumed to lie in [-6 N, +6 N] while Fz
+	// lies in [-11 N, 1 N].  Thus the total range is the same
+	// but with a different offset.  Both of these ranges are
+	// mapped to the pixel range [0, 255].  Since at this time
+	// we actually don't intend to go beyond a 10 N range for
+	// any of the directions, there is some wasted space, but
+	// this should catch any data in a reasonable range outside
+	// that desired range.  This will give an accuracy of up to
+	// 0.05 N in any direction.
+	temp_image[0] = floor(21.25*(force_sensor_m.curr_force.force[0] + 6.0));
+	temp_image[1] = floor(21.25*(force_sensor_m.curr_force.force[1] + 6.0));
+	temp_image[2] = floor(21.25*(1.0 - force_sensor_m.curr_force.force[2]));
+	
+	//Save the torque into the image
+	// All torques are assumed to lie in [-200 N-mm, +200 N-mm].  This range
+	// is mapped to the pixel range [0, 255].  As with the forces, there is
+	// expected to be some wasted space, since it appears that the torques
+	// never exceed +/-100 N-mm.  However, as with the forces, this is
+	// expected to catch data just outside the expected range.  (Any data
+	// fully outside the expected range will "wrap around" to the other end
+	// of the scale.)  This will give an accuracy of up to 1.5 N-mm in any
+	// direction.  We aren't worried about torques at this point but want to
+	// record them for possible future use.
+	temp_image[3] = floor(0.6375*(force_sensor_m.curr_force.force[3] + 200.0));
+	temp_image[4] = floor(0.6375*(force_sensor_m.curr_force.force[4] + 200.0));
+	temp_image[5] = floor(0.6375*(force_sensor_m.curr_force.force[5] + 200.0));
+	
+	//Save image to a filename
+	char filename[100];
+	sprintf(filename, "%simg_%04d.ppm", data_dir, current_training.current_count );
+	if (!ppm_write( filename, cols, rows, temp_image))
+	{
+	        printf("Incorrectly wrote image (%d)!\\n", current_training.current_count);
+	        return;
+	}
+	
+	// Update the progress bar
+	double progress_percent = ( (float) current_training.current_count) / ( (float) current_training.max_count ) * 100.0;
+	char progress_string[7];
+	sprintf(progress_string, "%6.2f%%", progress_percent);
+	training_progress->value(progress_percent);
+	training_percent->value(progress_string);
+	
+        // Turn off the training trajectory
+	if ( current_training.current_count >= current_training.max_count )
+	{
+		printf("The training is done\\n");
+		flag_start_training = false;
+	}
+        
+        // Start the timer again
+        Fl::repeat_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);
+}
+else if (!flag_force_ready)
+{
+        // If the force sensor is on and a training trajectory is active, update
+        //   the desired force using the "ramp-and-hold"
+        static float new_force[6];
+        static float old_force[6];
+        
+        // Determine where the timing is in the "ramp-and-hold" trajectory
+	if ( current_training.ramp_count == 0 )
+	{
+	        // Starting at the beginning of the ramp
+	        
+	        // Process each force direction to determine the new and old forces
+		for (int i=0; i<6; i++)
+		{
+		        if (maglev_m.force_control_directions[i])
+		        {
+		                // Read the new force from the trajectory array
+                                if (flag_start_training)
+			        {
+        			        new_force[i] = current_training.traj[i][current_training.current_count];
+			        }
+			        
+			        // If at the beginning of the trajectory, the old force is the current force.
+			        //   Otherwise, it is the previous force in the trajectory array.
+			        if ( current_training.current_count == 0 )
+			        {
+				        old_force[i] = force_sensor_m.curr_force.force[i];
+			        }
+			        else
+			        {
+				        old_force[i] = current_training.traj[i][current_training.current_count-1];
+			        }
+		        }
+		        else
+		        {
+		                // Read the new force from the trajectory array
+			        new_force[i] = current_training.traj[i][current_training.current_count];
+			        
+			        // If at the beginning of the trajectory, the old force is the current force.
+			        //   Otherwise, it is the previous force in the trajectory array.
+			        if ( current_training.current_count == 0 )
+			        {
+				        old_force[i] = maglev_m.current_position.values[i];
+			        }
+			        else
+			        {
+				        old_force[i] = current_training.traj[i][current_training.current_count-1];
+			        }
+		        }
+		}
+		
+		// If the training is finished, set the next force to the sliders
+		if (!flag_start_training)
+		{
+		        // Set x coordinate
+		        if (maglev_m.force_control_directions[0])
+        		        new_force[0] = desired_force_x->value();
+		        else
+		                new_force[0] = desired_position_x->value();
+	                
+		        // Set y coordinate
+		        if (maglev_m.force_control_directions[1])
+        		        new_force[1] = desired_force_y->value();
+		        else
+		                new_force[1] = desired_position_y->value();
+	                
+		        // Set z coordinate
+		        if (maglev_m.force_control_directions[2])
+        		        new_force[2] = desired_force_z->value();
+		        else
+		                new_force[2] = desired_position_z->value();
+	                
+		        // Set theta_x coordinate
+		        new_force[3] = desired_rotation_x->value();
+	                
+		        // Set theta_y coordinate
+		        new_force[4] = desired_rotation_y->value();
+	                
+		        // Set theta_z coordinate
+	                new_force[5] = desired_rotation_z->value();
+	                
+	                // Disable the Start/Stop Training button
+	                start_training->label("Start");
+	                start_training->clear();
+	                start_training->deactivate();
+                        current_training.ramp_max *= 5.0;
+                        if (trajectory_index->value() < trajectory_index->size())
+                        {
+                                trajectory_index->value(trajectory_index->value() + 1);
+                        }
+		}
+		else if ((flag_thumb) && (new_force[0]-3.0*new_force[1]-15 >= new_force[2]))
+		{
+		        printf("Skipping to next force\\n");
+		        current_training.ramp_count = (current_training.ramp_max + current_training.hold_min);
+		}
+	}
+	
+	// Run the ramp-and-hold trajectory
+	if (current_training.ramp_count < current_training.ramp_max)
+	{
+	        // The imager is ready, so the force can changes
+		for (int i=0; i<6; i++)
+		{
+			float interpolation_constant = ((float) current_training.ramp_count) / ((float) current_training.ramp_max);
+			if (maglev_m.force_control_directions[i])
+			{
+		                maglev_m.desired_force[i] = (new_force[i] - old_force[i]) * interpolation_constant + old_force[i];
+	                }
+	                else
+	                {
+	                        maglev_m.desired_position.values[i] = (new_force[i] - old_force[i]) * interpolation_constant + old_force[i];
+	                }
+		}
+		current_training.ramp_count += 1;
+		
+                // Start the timer again
+                Fl::repeat_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);
+	}
+	else if (current_training.ramp_count < current_training.ramp_max + current_training.hold_min)
+	{
+		for (int i=0; i<6; i++)
+		{
+		        if (maglev_m.force_control_directions[i])
+		        {
+			        maglev_m.desired_force[i] = new_force[i];
+		        }
+		        else
+		        {
+		                maglev_m.desired_position.values[i] = new_force[i];
+		        }
+		}
+		current_training.ramp_count+=1;
+		
+                // Start the timer again
+                Fl::repeat_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);
+	}
+	else if ( current_training.ramp_count == ( current_training.ramp_max + current_training.hold_min ) )
+	{
+		// The force is ready
+		flag_force_ready = true;
+		current_training.ramp_count = 0;
+		
+		if (flag_start_training)
+		{
+                        // Start the timer again
+                        Fl::repeat_timeout(1.0/TRAINING_FREQUENCY, record_training_images, NULL);
+                }
+                else
+                {
+                        // Reset the training button
+                        start_training->activate();
+                        current_training.ramp_max /= 5.0;
+                }
+	}
+}} {}
+}
