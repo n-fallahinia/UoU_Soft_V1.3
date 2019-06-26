@@ -1,14 +1,14 @@
 # UoU_soft_v1.3
 ********************************************************************************
-	UofU Calibration Software
+UofU Calibration Software
   
-	The Linux Control and Calibration Software for Maglev Device
+The Linux Control and Calibration Software for Maglev Device
   
-	University of Utah
+University of Utah
   
-	Biorobotics Lab
+Biorobotics Lab
 	
-  	Navid Fallahinia <n.fallahinia@utah.edu>
+Navid Fallahinia <n.fallahinia@utah.edu>
 ********************************************************************************
 * About gui_v1.3:
 
@@ -24,7 +24,7 @@ which has libraries to control the folotor position as well as the applied force
 the fingertip. Also it has libraries to interact with the force sensors and record the
 data from Flea2 and Flea3 cameras.
 
-!!!Important!!!
+!!!IMPORTANT!!!
 
 USE THE FOLLOWING ORDER TO START THE CAMERA:
 
