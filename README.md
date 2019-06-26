@@ -1,10 +1,14 @@
 # UoU_soft_v1.3
 ********************************************************************************
-  UofU Calibration Software
-  The Linux Control and Calibration Software for Maglev Device
-  University of Utah
+	UofU Calibration Software
+  
+	The Linux Control and Calibration Software for Maglev Device
+  
+	University of Utah
+  
 	Biorobotics Lab
-  Navid Fallahinia <n.fallahinia@utah.edu>
+	
+  	Navid Fallahinia <n.fallahinia@utah.edu>
 ********************************************************************************
 * About gui_v1.3:
 
@@ -15,7 +19,7 @@ various components.
 The intent is that this program may be used for diagnostic purposes, as well as
 a base for development of new applications when future research requires it.
 Copy this entire folder to a new working folder in order to modify it for your
-individual needs. gui_v2 is a modified version of generic GUI of the maglev Device 
+individual needs. gui_v1.3 is a modified version of generic GUI of the maglev Device 
 which has libraries to control the folotor position as well as the applied force to 
 the fingertip. Also it has libraries to interact with the force sensors and record the
 data from Flea2 and Flea3 cameras.
@@ -96,7 +100,7 @@ repository can be cloned locally using:
 
   git clone https://github.com/Linux-Comedi/comedilib.git
 
-gui_v2 may be freely distibuted and modified in accordance with
+gui_v1.3 may be freely distibuted and modified in accordance with
 the GNU Lesser General Public License.  Portions of the Comedilib
 distribution fall under different licenses; see the individual files
 for details.
