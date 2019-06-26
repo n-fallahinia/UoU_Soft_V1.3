@@ -95,13 +95,9 @@ you want to use, I am happy to pick up development on it again.
 ********************************************************************************
 * More Information:
 ********************************************************************************
-Git snapshots for Comedilib can be created automatically at
-<https://github.com/Linux-calsoft/master>.  The Git
-repository can be cloned locally using:
-
-  git clone https://github.com/Linux-Comedi/comedilib.git
+The Git repository can be cloned locally using:
+	
+	git clone https://github.com/n-fallahinia/UoU_soft_v1.3.git
 
 gui_v1.3 may be freely distibuted and modified in accordance with
-the GNU Lesser General Public License.  Portions of the Comedilib
-distribution fall under different licenses; see the individual files
-for details.
+the MIT License.
