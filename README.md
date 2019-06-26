@@ -25,14 +25,15 @@ the fingertip. Also it has libraries to interact with the force sensors and reco
 data from Flea2 and Flea3 cameras.
 
 !!!Important!!!
+
 USE THE FOLLOWING ORDER TO START THE CAMERA:
 
-1- connect
-2- lift up
-3- camera
-4- controller
-5- traj files
-6- training
+	1- connect
+	2- lift up
+	3- camera
+	4- controller
+	5- traj files
+	6- training
 
 ********************************************************************************
 Please do not modify the contents of this folder for your individual research.
